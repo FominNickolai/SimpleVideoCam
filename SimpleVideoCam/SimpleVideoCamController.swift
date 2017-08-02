@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import AVKit
 
 class SimpleVideoCamController: UIViewController {
 
@@ -87,7 +88,15 @@ class SimpleVideoCamController: UIViewController {
         }
         
     }
-
+    
+    //MARK: Segues
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "playVideo" {
+            let videoPlayerViewController = segue.destination as! AVPlayerViewController
+            let videoFileURL = sender as! URL
+            videoPlayerViewController.player = AVPlayer(url: videoFileURL)
+        }
+    }
 
 }
 
@@ -98,7 +107,7 @@ extension SimpleVideoCamController: AVCaptureFileOutputRecordingDelegate {
             print(error)
         }
         
-        
+        performSegue(withIdentifier: "playVideo", sender: outputFileURL)
         
     }
 }
