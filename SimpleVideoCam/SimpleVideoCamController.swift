@@ -19,6 +19,8 @@ class SimpleVideoCamController: UIViewController {
     var currentDevice: AVCaptureDevice?
     var cameraPreviewLayer: AVCaptureVideoPreviewLayer?
     
+    var isRecording = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         //Preset the session for taking photo in full resolution
@@ -62,7 +64,42 @@ class SimpleVideoCamController: UIViewController {
     }
     
     @IBAction func capture(sender: AnyObject) {
+        
+        if !isRecording {
+            isRecording = true
+            
+            UIView.animate(withDuration: 0.5, delay: 0.0, options: [.repeat, .autoreverse, .allowUserInteraction], animations: {
+                self.cameraButton.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+            }, completion: nil)
+            
+            let outputPath = NSTemporaryDirectory() + "output.mov"
+            let outputFileURL = URL(fileURLWithPath: outputPath)
+            videoFileOutput?.startRecording(toOutputFileURL: outputFileURL, recordingDelegate: self)
+        } else {
+            isRecording = false
+            
+            UIView.animate(withDuration: 0.5, delay: 1.0, options: [], animations: {
+                self.cameraButton.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+            }, completion: nil)
+            
+            cameraButton.layer.removeAllAnimations()
+            videoFileOutput?.stopRecording()
+        }
+        
     }
 
 
 }
+
+extension SimpleVideoCamController: AVCaptureFileOutputRecordingDelegate {
+    func capture(_ output: AVCaptureFileOutput!, didFinishRecordingToOutputFileAt outputFileURL: URL!, fromConnections connections: [Any]!, error: Error!) {
+        
+        if error != nil {
+            print(error)
+        }
+        
+        
+        
+    }
+}
+
